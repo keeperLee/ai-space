@@ -1,4 +1,4 @@
-# JianSpace · 简空间
+# AI Space
 
 独立的个人项目门户，提供统一登录、SQLite 用户管理与项目导航。
 
@@ -15,8 +15,8 @@
 需要 Node.js >= 22.13。
 
 ```sh
-git clone --recurse-submodules https://github.com/keeperLee/jian-space.git
-cd jian-space
+git clone --recurse-submodules https://github.com/keeperLee/ai-space.git
+cd ai-space
 npm run dev
 ```
 
@@ -41,7 +41,7 @@ git commit -m "chore: update agent learning project"
 
 ## GitHub Pages
 
-Pages 地址：https://keeperlee.github.io/jian-space/
+Pages 地址：https://keeperlee.github.io/ai-space/
 
 GitHub Pages 不支持 Node 与 SQLite，因此仅发布明确标注的部署状态页；不会上传数据库、账号文件或项目课程。完整门户需要部署到支持 Node 和持久化磁盘的服务器，当前尚未配置。`npm run build:pages` 只输出公开状态页至 `dist/`。
 

@@ -1,9 +1,9 @@
 {
-  "name": "jian-space",
+  "name": "ai-space",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "JianSpace 简空间：统一登录的个人项目门户",
+  "description": "AI Space：统一登录的个人项目门户",
   "keywords": [
     "agent",
     "llm",
