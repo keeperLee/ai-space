@@ -1,0 +1,313 @@
+/* ============================================================
+   登录门禁 / 账号菜单 / 管理后台
+   ============================================================ */
+
+/* ---------- 启动占位：登录状态确认前不泄露任何内容 ---------- */
+.boot-loader {
+  position: fixed; inset: 0; z-index: 90;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; background: var(--bg); color: var(--text-3); font-size: 13.5px;
+}
+.boot-loader[hidden] { display: none; }
+.bl-spin {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2.5px solid var(--border-strong); border-top-color: var(--accent);
+  animation: bl-spin .7s linear infinite;
+}
+@keyframes bl-spin { to { transform: rotate(360deg); } }
+
+html.auth-pending .topbar,
+html.auth-pending .layout,
+html.auth-pending .reading-progress { display: none !important; }
+
+/* 登录门禁开启时，应用外壳整体隐藏 —— 未登录看不到任何学习内容 */
+body.is-locked .topbar,
+body.is-locked .layout,
+body.is-locked .reading-progress { display: none !important; }
+body.is-locked .boot-loader { display: none; }
+
+/* ============================================================
+   登录页
+   ============================================================ */
+.auth-gate {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px 18px; overflow-y: auto;
+  background:
+    radial-gradient(1100px 520px at 12% -10%, var(--accent-soft), transparent 62%),
+    radial-gradient(900px 460px at 108% 110%, var(--accent-soft), transparent 58%),
+    var(--bg-sub);
+}
+
+/* 必须显式声明：上面的 display:flex 是作者样式，
+   会盖过浏览器默认的 [hidden]{display:none}，导致 hidden 属性失效 ——
+   登录后门禁仍会浮在页面上，把整个应用遮住。 */
+.auth-gate[hidden] { display: none; }
+
+.ag-card {
+  width: 100%; max-width: 412px; margin: auto;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-l); box-shadow: var(--shadow-lg);
+  padding: 32px 30px 26px;
+}
+
+.ag-brand {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 13px; font-weight: 700; color: var(--text-3);
+  letter-spacing: .02em; margin-bottom: 18px;
+}
+.ag-brand .brand-mark {
+  width: 26px; height: 26px; border-radius: 8px;
+  display: grid; place-items: center;
+  background: var(--accent); color: #fff;
+}
+
+.ag-card h1 { margin: 0 0 6px; font-size: 22px; letter-spacing: -.01em; }
+.ag-sub { margin: 0 0 22px; font-size: 13.5px; color: var(--text-3); line-height: 1.6; }
+
+.ag-field { display: block; margin-bottom: 14px; }
+.ag-field > span {
+  display: block; font-size: 12.5px; font-weight: 600;
+  color: var(--text-2); margin-bottom: 6px;
+}
+.ag-field input[type="text"],
+.ag-field input[type="password"],
+.ag-input {
+  width: 100%; padding: 10px 12px; font: inherit; font-size: 14.5px;
+  color: var(--text); background: var(--surface-2);
+  border: 1px solid var(--border-strong); border-radius: var(--radius);
+  transition: border-color .15s var(--ease), box-shadow .15s var(--ease);
+}
+.ag-field input:focus, .ag-input:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+.ag-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 16px; }
+.ag-remember { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-2); cursor: pointer; }
+.ag-remember input { accent-color: var(--accent); width: 15px; height: 15px; }
+
+.ag-error {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 10px 12px; margin-bottom: 14px; font-size: 13px; line-height: 1.55;
+  color: var(--danger); background: var(--danger-soft);
+  border: 1px solid color-mix(in srgb, var(--danger) 28%, transparent);
+  border-radius: var(--radius);
+}
+.ag-error[hidden] { display: none; }
+
+.ag-submit { width: 100%; justify-content: center; padding: 11px; font-size: 15px; }
+.ag-submit[disabled] { opacity: .62; cursor: progress; }
+
+/* 安全说明：不回避"这不是真正的安全防护"这件事 */
+.ag-security {
+  display: flex; gap: 9px; align-items: flex-start;
+  margin-top: 22px; padding: 11px 13px;
+  font-size: 12px; line-height: 1.66; color: var(--text-3);
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.ag-security b { color: var(--text-2); font-weight: 650; }
+.ag-security .ag-sec-ico { flex: none; line-height: 1.4; }
+
+.ag-foot {
+  margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--border);
+  font-size: 11.5px; color: var(--text-4); line-height: 1.7;
+}
+.ag-foot code { background: var(--surface-3); padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+
+/* ============================================================
+   顶栏账号入口
+   ============================================================ */
+.user-btn { position: relative; }
+.ub-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 12.5px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  user-select: none;
+}
+.ub-dot {
+  position: absolute; top: 3px; right: 3px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--warn); border: 1.5px solid var(--surface);
+}
+
+.user-menu {
+  position: fixed; z-index: 210; min-width: 236px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow-lg);
+  padding: 6px; animation: um-in .13s var(--ease);
+}
+@keyframes um-in { from { opacity: 0; transform: translateY(-5px); } }
+.user-menu[hidden] { display: none; }
+
+.um-head { display: flex; gap: 10px; align-items: center; padding: 10px 10px 12px; }
+.um-avatar {
+  width: 36px; height: 36px; border-radius: 50%; flex: none;
+  display: grid; place-items: center; font-size: 15px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+}
+.um-id { min-width: 0; }
+.um-id b { display: block; font-size: 14px; line-height: 1.35; }
+.um-id small { display: block; font-size: 11.5px; color: var(--text-3); }
+
+.user-menu hr { border: 0; border-top: 1px solid var(--border); margin: 5px 0; }
+
+.um-item {
+  display: flex; align-items: center; gap: 9px; width: 100%;
+  padding: 8px 10px; font: inherit; font-size: 13.5px; text-align: left;
+  color: var(--text-2); background: transparent; border: 0;
+  border-radius: 8px; cursor: pointer; transition: .13s var(--ease);
+}
+.um-item:hover { background: var(--surface-3); color: var(--text); }
+.um-item.is-danger { color: var(--danger); }
+.um-item.is-danger:hover { background: var(--danger-soft); }
+.um-item .um-ico { flex: none; width: 16px; text-align: center; }
+
+.um-foot {
+  padding: 8px 10px 6px; font-size: 11px; color: var(--text-4);
+  border-top: 1px solid var(--border); margin-top: 5px;
+}
+
+/* ============================================================
+   通用表单（账号面板 / 管理后台共用）
+   ============================================================ */
+.field { display: block; margin-bottom: 13px; }
+.field > span { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-2); margin-bottom: 6px; }
+.field select, .field input, .field textarea {
+  width: 100%; padding: 9px 11px; font: inherit; font-size: 14px;
+  color: var(--text); background: var(--surface-2);
+  border: 1px solid var(--border-strong); border-radius: var(--radius);
+}
+.field select:focus, .field input:focus, .field textarea:focus {
+  outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring);
+}
+.field .hint { display: block; margin-top: 5px; font-size: 11.5px; color: var(--text-4); line-height: 1.55; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.form-msg { padding: 10px 12px; border-radius: var(--radius); font-size: 13px; line-height: 1.55; margin-bottom: 13px; }
+.form-msg[hidden] { display: none; }
+.form-msg.is-error { color: var(--danger); background: var(--danger-soft); }
+.form-msg.is-ok { color: var(--ok); background: var(--ok-soft); }
+.form-msg.is-warn { color: var(--warn); background: var(--warn-soft); }
+
+/* 密码强度 */
+.pw-meter { margin-top: 7px; }
+.pw-bars { display: flex; gap: 4px; margin-bottom: 5px; }
+.pw-bars i { flex: 1; height: 4px; border-radius: 3px; background: var(--surface-3); transition: background .2s var(--ease); }
+.pw-meter[data-score="0"] .pw-bars i:nth-child(-n+1),
+.pw-meter[data-score="1"] .pw-bars i:nth-child(-n+1) { background: var(--danger); }
+.pw-meter[data-score="2"] .pw-bars i:nth-child(-n+2) { background: var(--warn); }
+.pw-meter[data-score="3"] .pw-bars i:nth-child(-n+3) { background: var(--ok); }
+.pw-meter[data-score="4"] .pw-bars i { background: var(--ok); }
+.pw-label { font-size: 11.5px; color: var(--text-3); }
+.pw-label b { color: var(--text-2); }
+
+/* ============================================================
+   管理后台
+   ============================================================ */
+.admin-modal {
+  width: min(1000px, 100%);
+  max-height: min(88vh, 860px);
+  display: flex; flex-direction: column;
+}
+.account-modal {
+  width: min(470px, 100%);
+  max-height: min(88vh, 860px);
+  display: flex; flex-direction: column;
+}
+.admin-head {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+}
+.admin-head-main { flex: 1; min-width: 0; }
+.admin-kicker { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--accent); }
+.admin-title { font-size: 18px; font-weight: 700; margin-top: 3px; }
+.admin-title small { font-size: 12.5px; font-weight: 400; color: var(--text-3); margin-left: 8px; }
+
+.admin-body { overflow-y: auto; padding: 16px 20px 20px; }
+
+.admin-note {
+  display: flex; gap: 11px; align-items: flex-start;
+  padding: 12px 14px; margin-bottom: 16px;
+  font-size: 12.5px; line-height: 1.68; color: var(--text-2);
+  background: var(--warn-soft); border: 1px solid color-mix(in srgb, var(--warn) 30%, transparent);
+  border-radius: var(--radius);
+}
+.admin-note.is-clean { color: var(--text-3); background: var(--surface-2); border-color: var(--border); }
+.admin-note b { color: var(--text); }
+.admin-note .an-ico { flex: none; }
+.admin-note-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+.admin-toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  margin-bottom: 16px;
+}
+.admin-toolbar .grow { flex: 1; }
+.admin-count { font-size: 12.5px; color: var(--text-3); }
+
+.admin-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.admin-table th {
+  text-align: left; font-size: 11.5px; font-weight: 700; letter-spacing: .03em;
+  color: var(--text-3); text-transform: uppercase;
+  padding: 8px 10px; border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.admin-table td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.admin-table tr:last-child td { border-bottom: 0; }
+.admin-table tr.is-off td { opacity: .55; }
+.admin-table .who { display: flex; align-items: center; gap: 9px; }
+.admin-table .who .av {
+  width: 28px; height: 28px; border-radius: 50%; flex: none;
+  display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+}
+.admin-table .who b { display: block; font-size: 13.5px; font-weight: 600; line-height: 1.35; }
+.admin-table .who small { display: block; font-size: 11.5px; color: var(--text-3); }
+.admin-table .row-act { display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; }
+.admin-table .muted-cell { color: var(--text-3); font-size: 12.5px; }
+
+/* 会被后端拒绝的操作直接置灰，而不是让人点了才报错 */
+.admin-table .btn:disabled,
+.admin-form-actions .btn:disabled {
+  opacity: .4; cursor: not-allowed;
+}
+
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 20px;
+  font-size: 11.5px; font-weight: 600; white-space: nowrap;
+}
+.tag-admin { color: var(--accent); background: var(--accent-soft); }
+.tag-member { color: var(--text-3); background: var(--surface-3); }
+.tag-on { color: var(--ok); background: var(--ok-soft); }
+.tag-off { color: var(--text-3); background: var(--surface-3); }
+.tag-self { color: var(--info); background: var(--info-soft); }
+
+.admin-empty { padding: 40px 0; text-align: center; color: var(--text-3); font-size: 13.5px; }
+
+.admin-form {
+  padding: 16px; margin-bottom: 16px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.admin-form[hidden] { display: none; }
+.admin-form h4 { margin: 0 0 14px; font-size: 14px; }
+.admin-form-actions { display: flex; gap: 8px; margin-top: 4px; }
+
+@media (max-width: 720px) {
+  .ag-card { padding: 26px 20px 22px; }
+  .admin-modal { max-height: 92vh; }
+  .admin-body { padding: 14px; }
+  .field-row { grid-template-columns: 1fr; }
+  .admin-table thead { display: none; }
+  .admin-table tr {
+    display: block; padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .admin-table td { display: block; border: 0; padding: 3px 0; }
+  .admin-table .row-act { justify-content: flex-start; margin-top: 8px; }
+  .admin-table td[data-th]::before {
+    content: attr(data-th) "："; font-size: 11.5px; color: var(--text-4);
+  }
+}

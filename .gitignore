@@ -1,0 +1,27 @@
+# 依赖与构建产物（本项目本身不需要，防误提交）
+node_modules/
+_site/
+dist/
+
+# 示例项目的运行期产物与 Python 缓存
+examples/support-agent/data/state/
+__pycache__/
+*.py[cod]
+
+# 系统 / 编辑器
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.log
+
+# 服务端私有数据与配置，禁止提交
+data/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+.env
+.env.*
+!.env.example

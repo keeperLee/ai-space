@@ -1,0 +1,3 @@
+[submodule "projects/agent-learning"]
+	path = projects/agent-learning
+	url = https://github.com/keeperLee/agent-learning-platform.git

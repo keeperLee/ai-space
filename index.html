@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN" class="auth-pending">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="项目门户：从这里访问学习平台与更多项目。">
+  <meta name="theme-color" content="#f7f9fc">
+  <title>项目门户 · Jian's Space</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='11' fill='%232950dc'/%3E%3Cpath d='M12 11h16v12a8 8 0 0 1-16 0' stroke='white' stroke-width='4' fill='none'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/css/portal.css">
+  <link rel="stylesheet" href="assets/css/auth.css">
+  <script type="module" src="assets/js/portal.js"></script>
+</head>
+<body>
+  <div class="boot-loader" id="bootLoader"><p>正在检查登录状态…</p></div>
+  <a class="skip" href="#main">跳到项目列表</a>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="项目门户首页"><span class="brand-icon">J.</span><span>Jian's Space</span></a>
+    <div class="portal-account"><span id="portalUser"></span><button id="portalLogout" type="button">退出登录</button></div>
+  </header>
+  <main id="main">
+    <section class="intro" aria-labelledby="page-title">
+      <div class="eyebrow"><span></span> 你的项目，从这里开始</div>
+      <h1 id="page-title">一个入口，<br>连接每一次<span>探索。</span></h1>
+      <p>学习新知识，打开新工具，继续手中的项目。</p>
+      <div class="intro-art" aria-hidden="true"><div class="tile tile-a">A<span>LEARN</span></div><div class="tile tile-b">↗</div><div class="tile tile-c">＋</div><div class="orbit"></div></div>
+    </section>
+    <section class="project-section" aria-labelledby="projects-title">
+      <div class="section-heading"><div><span class="eyebrow">WORKSPACE / 01</span><h2 id="projects-title">所有项目</h2></div><span id="projectCount">项目列表</span></div>
+      <div class="project-grid" id="projects"></div>
+      <noscript><p><a href="./learning.html">进入 Agent 学习平台</a></p></noscript>
+      <div class="coming-soon"><span class="plus">＋</span><div><h3>下一段探索，即将开启</h3><p>更多项目将在这里与你见面。</p></div><span class="soon-label">敬请期待</span></div>
+    </section>
+  </main>
+  <footer><span>Jian's Space</span><span>保持好奇，持续创造。</span></footer>
+  <div class="auth-gate" id="authGate" hidden>
+    <div class="ag-card">
+      <div class="ag-brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none">
+            <rect x="4" y="7" width="16" height="12" rx="3.5" stroke="currentColor" stroke-width="1.7"/>
+            <circle cx="9.5" cy="13" r="1.4" fill="currentColor"/><circle cx="14.5" cy="13" r="1.4" fill="currentColor"/>
+            <path d="M12 7V4M9 4h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span>Jian's Space · 项目门户</span>
+      </div>
+
+      <h1>登录</h1>
+      <p class="ag-sub">登录一次，即可访问门户内的所有项目。</p>
+
+      <form id="loginForm" autocomplete="on" novalidate>
+        <div class="ag-error" id="loginError" hidden role="alert"></div>
+
+        <label class="ag-field">
+          <span>登录名</span>
+          <input type="text" id="loginUser" name="username" autocomplete="username"
+                 autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="请输入登录名" />
+        </label>
+
+        <label class="ag-field">
+          <span>密码</span>
+          <input type="password" id="loginPass" name="password" autocomplete="current-password" placeholder="请输入密码" />
+        </label>
+
+        <div class="ag-row">
+          <label class="ag-remember">
+            <input type="checkbox" id="loginRemember" checked />
+            <span>在这台设备上保持登录</span>
+          </label>
+        </div>
+
+        <button class="btn btn-primary ag-submit" id="loginSubmit" type="submit">登录</button>
+      </form>
+
+      <div class="ag-security">
+        <span class="ag-sec-ico" aria-hidden="true">🔒</span>
+        <div>
+          首次使用请设置管理员密码。之后使用账号登录，即可进入所有项目。
+        </div>
+      </div>
+
+      <div class="ag-foot">
+        登录遇到问题？请联系管理员 <code>admin</code> 开通或重置账号。<br />
+        忘记密码无法自助找回，需管理员重置后重新登录。
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

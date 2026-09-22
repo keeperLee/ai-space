@@ -1,0 +1,30 @@
+{
+  "name": "jian-space",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "JianSpace 简空间：统一登录的个人项目门户",
+  "keywords": [
+    "agent",
+    "llm",
+    "documentation",
+    "static-site",
+    "github-pages"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "start": "node scripts/serve.mjs",
+    "validate": "node scripts/validate.mjs",
+    "test": "node scripts/validate.mjs && node --test scripts/auth.test.mjs",
+    "check-links": "node scripts/check-links.mjs",
+    "e2e": "node scripts/e2e.mjs",
+    "user": "node scripts/user.mjs",
+    "predeploy-check": "node scripts/validate.mjs",
+    "test:auth": "node --test scripts/auth.test.mjs",
+    "build:pages": "node scripts/build-pages.mjs"
+  }
+}
