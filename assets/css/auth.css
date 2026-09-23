@@ -2,6 +2,13 @@
    登录门禁 / 账号菜单 / 管理后台
    ============================================================ */
 
+/* ---------- 公开访问模式（见 assets/js/access.js） ----------
+   不需要登录时，把顶栏的账号入口整体收起，避免出现一个
+   点了没反应的按钮。门禁与账号面板的样式保留，改回
+   ACCESS.open = false 即可恢复。 */
+html.no-account-ui .portal-account { display: none; }
+html.no-account-ui .user-btn { display: none; }
+
 /* ---------- 启动占位：登录状态确认前不泄露任何内容 ---------- */
 .boot-loader {
   position: fixed; inset: 0; z-index: 90;

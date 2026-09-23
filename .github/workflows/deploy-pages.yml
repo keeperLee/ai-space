@@ -1,15 +1,22 @@
 name: Deploy portal Pages
+
+# 公开访问形态：门户与学习项目一起作为纯静态站点发布。
+# 注意 build-pages.mjs 会把子模块（projects/agent-learning）的内容一起打包，
+# 所以这里必须 recursive 检出子模块，否则构建会因缺少 learning.html 而失败。
 on:
   push:
     branches: [main]
   workflow_dispatch:
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
 concurrency:
   group: pages
   cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -18,13 +25,24 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - run: npm run build:pages
+
+      - name: 校验
+        run: npm run validate
+
+      - name: 构建静态站点
+        run: npm run build:pages
+
       - uses: actions/configure-pages@v5
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+
       - id: deployment
         uses: actions/deploy-pages@v4

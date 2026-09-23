@@ -1,12 +1,23 @@
+import { ACCESS } from './access.js';
 export { ROLES, ROLE_LABEL, MIN_PASSWORD, normalizeUsername, validateUsername, validateDisplayName, validatePassword, passwordStrength } from './userdir.js';
+
 let user=null, setup=false, users=[];
+
+/** 公开访问模式：不校验登录，也不请求账号服务 */
+export const isOpen=()=>ACCESS.open;
 export async function request(action,body) {
   try {
     const res=await fetch(new URL(`../../api/${action}`,import.meta.url),{method:body===undefined?'GET':'POST',credentials:'same-origin',headers:body===undefined?{}:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});
     return await res.json();
   } catch {return {ok:false,error:'无法连接账号服务。请使用 Node 服务访问，GitHub Pages 不支持数据库登录。'};}
 }
-export async function initialize(){const r=await request('session');if(!r.ok)throw new Error(r.error);user=r.user;setup=r.needsSetup;try { for(const s of [localStorage,sessionStorage]){s.removeItem('agent-learning-platform:session:v1');s.removeItem('agent-learning-platform:users-override:v1');} } catch {}}
+export async function initialize(){
+  // 公开访问：不请求 /api/session，直接按「无账号访客」放行。
+  // 这样在 GitHub Pages 这种没有服务端的托管上也能正常打开。
+  if(ACCESS.open){user=null;setup=false;return;}
+  const r=await request('session');if(!r.ok)throw new Error(r.error);user=r.user;setup=r.needsSetup;
+  try { for(const s of [localStorage,sessionStorage]){s.removeItem('agent-learning-platform:session:v1');s.removeItem('agent-learning-platform:users-override:v1');} } catch {}
+}
 export const needsSetup=()=>setup;
 export const setupAdmin=password=>request('setup',{password});
 export const currentUser=()=>user;

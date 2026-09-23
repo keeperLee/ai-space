@@ -7,6 +7,7 @@ import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { createServer } from 'node:net';
 import { randomBytes } from 'node:crypto';
+import { ACCESS } from '../assets/js/access.js';
 
 test('SQLite authentication lifecycle and HTTP isolation',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'portal-auth-'));
@@ -16,13 +17,24 @@ test('SQLite authentication lifecycle and HTTP isolation',async()=>{
  async function stop(){const exited=once(child,'exit');child.kill();await exited;}
  async function call(path,body,cookie='',origin=base){const r=await fetch(base+'/api/'+path,{method:body===undefined?'GET':'POST',headers:{Cookie:cookie,...(body===undefined?{}:{Origin:origin,'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body)});return {status:r.status,data:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0],headers:r.headers};}
  const pass=randomBytes(24).toString('hex'), memberPass=randomBytes(24).toString('hex');
+ /* 站点要不要登录，由 assets/js/access.js 的开关决定（见该文件说明）。
+    这里两种模式都断言，避免开关一改测试就误报。 */
+ const pub=ACCESS.open;
+ const status=async(path,opts={})=>(await fetch(base+path,{redirect:'manual',...opts})).status;
  try {
   await start();
   assert.equal((await call('session')).data.needsSetup,true);
-  const redirect=await fetch(base+'/projects/agent-learning/learning.html',{redirect:'manual'});
-  assert.equal(redirect.status,302);assert.match(redirect.headers.get('location'),/^\/\?next=/);
-  assert.equal((await fetch(base+'/content/projects.js')).status,401);
-  assert.equal((await fetch(base+'/projects/example.html',{redirect:'manual'})).status,302);
+  if(pub){
+    // 公开访问：没有 Cookie 也应该能拿到门户、项目列表与课程内容
+    assert.equal(await status('/projects/agent-learning/learning.html'),200);
+    assert.equal(await status('/content/projects.js'),200);
+    assert.equal(await status('/projects/agent-learning/content/chapters/c01.md'),200);
+  }else{
+    const redirect=await fetch(base+'/projects/agent-learning/learning.html',{redirect:'manual'});
+    assert.equal(redirect.status,302);assert.match(redirect.headers.get('location'),/^\/\?next=/);
+    assert.equal(await status('/content/projects.js'),401);
+    assert.equal(await status('/projects/example.html'),302);
+  }
   assert.equal((await call('login',{username:'admin',password:''})).status,401);
   assert.equal((await call('setup',{password:pass},'','https://other.example')).status,403);
   assert.equal((await call('setup',{password:''})).status,400);
@@ -31,7 +43,7 @@ test('SQLite authentication lifecycle and HTTP isolation',async()=>{
   assert.equal((await call('session')).data.needsSetup,false);
   assert.equal((await call('login',{username:'admin',password:'bad'})).status,401);
   assert.equal((await call('users')).status,403);
-  assert.equal((await fetch(base+'/projects/agent-learning/content/chapters/c01.md',{redirect:'manual'})).status,302);
+  if(!pub)assert.equal(await status('/projects/agent-learning/content/chapters/c01.md'),302);
   for(const p of ['/data/app.sqlite','/.git/config','/.env','/server/auth.mjs','/content/users.js','/scripts/serve.mjs'])assert.equal((await fetch(base+p)).status,404,p);
   const login=await call('login',{username:'admin',password:pass,remember:true});assert.equal(login.status,200);assert.match(login.headers.get('set-cookie'),/HttpOnly/);let admin=login.cookie;
   const nestedSession=await fetch(base+'/projects/agent-learning/api/session',{headers:{Cookie:admin}});
@@ -63,6 +75,7 @@ test('SQLite authentication lifecycle and HTTP isolation',async()=>{
   assert.equal((await call('session',undefined,admin)).data.user,null);
   admin=(await call('login',{username:'admin',password:newPass})).cookie;
   await call('logout',{},admin);assert.equal((await call('session',undefined,admin)).data.user,null);
-  assert.equal((await fetch(base+'/projects/agent-learning/learning.html',{headers:{Cookie:admin},redirect:'manual'})).status,302);
+  // 退出后 Cookie 失效：公开访问仍可读，门禁模式则被挡回登录页
+  assert.equal(await status('/projects/agent-learning/learning.html',{headers:{Cookie:admin}}),pub?200:302);
  }finally{if(child?.exitCode===null)await stop();await rm(dir,{recursive:true,force:true});}
 });
