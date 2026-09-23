@@ -24,6 +24,12 @@ async function renderProjects() {
     const url = new URL(project.href, document.baseURI);
     if (!['http:', 'https:'].includes(url.protocol)) continue;
     card.href = url.href;
+    // 指向站外的项目（例如源码仓库）在新标签页打开，别把门户顶掉
+    const isExternal = url.origin !== location.origin;
+    if (isExternal) {
+      card.target = '_blank';
+      card.rel = 'noopener noreferrer';
+    }
     const mark = document.createElement('div');
     mark.className = 'project-mark';
     mark.textContent = project.icon || project.title.slice(0, 1);
@@ -43,7 +49,7 @@ async function renderProjects() {
     }
     const action = document.createElement('div');
     action.className = 'card-action';
-    action.textContent = '进入项目 ↗';
+    action.textContent = project.action || (isExternal ? '在新标签页打开 ↗' : '进入项目 ↗');
     card.append(mark, category, title, description, tags, action);
     grid.append(card);
   }
